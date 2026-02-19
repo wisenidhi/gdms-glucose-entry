@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDMS - Glucose Entry</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: #555;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .form-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 0 auto 25px auto;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .form-box h2 {
+            margin-top: 0;
+            font-size: 18px;
+            color: #2c3e50;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+        }
+
+        input[type="number"],
+        input[type="datetime-local"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #777;
+            margin-top: 3px;
+        }
+
+        .auto-note {
+            background-color: #eaf4fb;
+            border-left: 3px solid #3498db;
+            padding: 8px 10px;
+            font-size: 13px;
+            margin-top: 12px;
+            color: #2471a3;
+            border-radius: 3px;
+        }
+
+        /* threshold reference box */
+        .threshold-box {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px 14px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #444;
+        }
+
+        .threshold-box strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-size: 13px;
+        }
+
+        .threshold-box table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .threshold-box td {
+            padding: 3px 6px;
+        }
+
+        .threshold-box td:last-child {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .btn-row {
+            margin-top: 18px;
+        }
+
+        button {
+            padding: 9px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #addBtn {
+            background-color: #2980b9;
+            color: white;
+        }
+
+        #addBtn:hover {
+            background-color: #1a6fa8;
+        }
+
+        #clearBtn {
+            background-color: #ecf0f1;
+            color: #555;
+            margin-left: 8px;
+        }
+
+        #clearBtn:hover {
+            background-color: #dde1e3;
+        }
+
+        #msg {
+            margin-top: 10px;
+            font-size: 13px;
+            padding: 7px 10px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        #msg.error {
+            background-color: #fdecea;
+            color: #c0392b;
+            display: block;
+        }
+
+        #msg.success {
+            background-color: #eafaf1;
+            color: #1e8449;
+            display: block;
+        }
+
+        .list-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .list-box h2 {
+            margin-top: 0;
+            font-size: 18px;
+            color: #2c3e50;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        .filter-row select {
+            padding: 5px 8px;
+            font-size: 13px;
+            width: auto;
+        }
+
+        .filter-row label {
+            font-weight: normal;
+            margin: 0;
+            color: #555;
+        }
+
+        .entry-card {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            background-color: #fdfdfd;
+        }
+
+        .entry-card:hover {
+            background-color: #f7f9fc;
+        }
+
+        .entry-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .glucose-val {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .glucose-val span {
+            font-size: 12px;
+            font-weight: normal;
+            color: #888;
+            margin-left: 3px;
+        }
+
+        .badges {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .priority {
+            font-size: 12px;
+            font-weight: bold;
+            padding: 3px 9px;
+            border-radius: 12px;
+        }
+
+        .normal   { background-color: #d5f5e3; color: #1e8449; }
+        .elevated { background-color: #fef9e7; color: #b7770d; }
+        .critical { background-color: #fadbd8; color: #922b21; }
+
+        /* entry type tag */
+        .type-tag {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background-color: #eaf4fb;
+            color: #2471a3;
+            font-weight: bold;
+        }
+
+        .type-tag.postmeal {
+            background-color: #f5eafb;
+            color: #6c2482;
+        }
+
+        .entry-details {
+            font-size: 13px;
+            color: #555;
+            margin-top: 4px;
+        }
+
+        .entry-details span {
+            margin-right: 12px;
+        }
+
+        .review-status {
+            font-size: 11px;
+            margin-top: 5px;
+            color: #1a5276;
+            font-style: italic;
+        }
+
+        .review-status.done {
+            color: #888;
+        }
+
+        .entry-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .editBtn {
+            background-color: #f0f0f0;
+            color: #333;
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .editBtn:hover { background-color: #e0e0e0; }
+
+        .deleteBtn {
+            background-color: #fff0f0;
+            color: #c0392b;
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 4px;
+            border: 1px solid #e8b4b0;
+        }
+
+        .deleteBtn:hover { background-color: #fde0dd; }
+
+        .saveBtn {
+            background-color: #2980b9;
+            color: white;
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 4px;
+        }
+
+        .cancelBtn {
+            background-color: #ecf0f1;
+            color: #555;
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 4px;
+        }
+
+        .edit-val-input {
+            width: 80px;
+            font-size: 16px;
+            padding: 3px 6px;
+            border: 1px solid #3498db;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .edit-ts-input {
+            font-size: 13px;
+            padding: 3px 6px;
+            border: 1px solid #3498db;
+            border-radius: 4px;
+        }
+
+        .empty-msg {
+            text-align: center;
+            color: #aaa;
+            padding: 30px 0;
+            font-size: 14px;
+        }
+
+        .stats-strip {
+            display: flex;
+            justify-content: space-around;
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            padding: 14px 10px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat .num {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stat .lbl {
+            font-size: 11px;
+            color: #888;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Gestational Diabetes Monitoring System</h1>
+<p class="subtitle">Glucose Entry Management &nbsp;|&nbsp; Patient: Nidhi Shree (ID #00142)</p>
+
+<!-- Stats strip -->
+<div class="stats-strip">
+    <div class="stat">
+        <div class="num" id="statTotal">0</div>
+        <div class="lbl">Total Entries</div>
+    </div>
+    <div class="stat">
+        <div class="num" id="statAvg">—</div>
+        <div class="lbl">7-Day Avg (mg/dL)</div>
+    </div>
+    <div class="stat">
+        <div class="num" id="statPending">0</div>
+        <div class="lbl">Pending Review</div>
+    </div>
+</div>
+
+<!-- Add Entry Form -->
+<div class="form-box">
+    <h2>Add Glucose Entry</h2>
+
+    <label for="entryType">Entry Type</label>
+    <select id="entryType" onchange="updateHint()">
+        <option value="fasting">Fasting (Morning Finger Stick)</option>
+        <option value="postmeal">1-Hour Post-Meal</option>
+    </select>
+
+    <label for="glucoseInput">Glucose Value (mg/dL)</label>
+    <input type="number" id="glucoseInput" placeholder="e.g. 88" min="20" max="600">
+    <div class="hint" id="rangeHint">Target for fasting: under 95 mg/dL</div>
+
+    <label for="timeInput">Date &amp; Time</label>
+    <input type="datetime-local" id="timeInput">
+
+    <label for="notesInput">Notes (optional)</label>
+    <input type="text" id="notesInput" placeholder="e.g. Felt dizzy, after morning walk...">
+
+    <!-- GDM threshold reference -->
+    <div class="threshold-box">
+        <strong>GDM Glucose Targets (per provider guidelines)</strong>
+        <table>
+            <tr>
+                <td>Fasting</td>
+                <td>under 95 mg/dL</td>
+            </tr>
+            <tr>
+                <td>1-Hour Post-Meal</td>
+                <td>under 140 mg/dL</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="auto-note">
+        &#9432; Priority level is assigned automatically based on your glucose value and entry type. Patients cannot change priority — this is set by the provider.
+    </div>
+
+    <div class="btn-row">
+        <button id="addBtn" onclick="addEntry()">Add Entry</button>
+        <button id="clearBtn" onclick="clearForm()">Clear</button>
+    </div>
+
+    <div id="msg"></div>
+</div>
+
+<!-- Entry List -->
+<div class="list-box">
+    <h2>Glucose Log</h2>
+
+    <div class="filter-row">
+        <label>Type:</label>
+        <select id="filterType" onchange="showEntries()">
+            <option value="all">All</option>
+            <option value="fasting">Fasting</option>
+            <option value="postmeal">Post-Meal</option>
+        </select>
+
+        <label style="margin-left:6px;">Priority:</label>
+        <select id="filterPriority" onchange="showEntries()">
+            <option value="all">All</option>
+            <option value="normal">Normal</option>
+            <option value="elevated">Elevated</option>
+            <option value="critical">Critical</option>
+        </select>
+
+        <label style="margin-left:6px;">Sort:</label>
+        <select id="sortOrder" onchange="showEntries()">
+            <option value="desc">Newest First</option>
+            <option value="asc">Oldest First</option>
+        </select>
+    </div>
+
+    <div id="entryList"></div>
+</div>
+
+<script>
+    var entries = [];
+    var currentEditId = null;
+
+    // GDM clinical thresholds
+    // Fasting: normal < 95, elevated 95-104, critical >= 105
+    // 1-hr post-meal: normal < 140, elevated 140-159, critical >= 160
+    function getPriority(val, type) {
+        if (type === "fasting") {
+            if (val < 95)  return "normal";
+            if (val < 105) return "elevated";
+            return "critical";
+        } else {
+            // post-meal (1 hour)
+            if (val < 140) return "normal";
+            if (val < 160) return "elevated";
+            return "critical";
+        }
+    }
+
+    function formatDate(isoString) {
+        var d = new Date(isoString);
+        var options = { month: 'short', day: 'numeric', year: 'numeric' };
+        return d.toLocaleDateString('en-US', options) + ' at ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function getDatePart(isoString) {
+        return isoString.substring(0, 10);
+    }
+
+    // update the hint text when entry type changes
+    function updateHint() {
+        var type = document.getElementById("entryType").value;
+        var hint = document.getElementById("rangeHint");
+        if (type === "fasting") {
+            hint.textContent = "Target for fasting: under 95 mg/dL";
+        } else {
+            hint.textContent = "Target for 1-hour post-meal: under 140 mg/dL";
+        }
+    }
+
+    function loadSampleData() {
+        var today = new Date();
+
+        function daysBack(n, hour) {
+            var d = new Date(today);
+            d.setDate(d.getDate() - n);
+            d.setHours(hour, 30, 0, 0);
+            return d.toISOString();
+        }
+
+        var samples = [
+            { value: 88,  type: "fasting",  timestamp: daysBack(0, 7),  notes: "",                  reviewed: false },
+            { value: 132, type: "postmeal", timestamp: daysBack(0, 13), notes: "After lunch",        reviewed: false },
+            { value: 98,  type: "fasting",  timestamp: daysBack(1, 7),  notes: "Woke up late",      reviewed: false },
+            { value: 145, type: "postmeal", timestamp: daysBack(1, 12), notes: "After big lunch",   reviewed: false },
+            { value: 82,  type: "fasting",  timestamp: daysBack(2, 7),  notes: "After 30-min walk", reviewed: true  },
+            { value: 162, type: "postmeal", timestamp: daysBack(2, 19), notes: "Had pasta",         reviewed: false },
+            { value: 107, type: "fasting",  timestamp: daysBack(3, 7),  notes: "Skipped dinner",    reviewed: false },
+            { value: 88,  type: "fasting",  timestamp: daysBack(4, 7),  notes: "Normal night",      reviewed: true  }
+        ];
+
+        for (var i = 0; i < samples.length; i++) {
+            entries.push({
+                id: Date.now() - (i * 50000),
+                value: samples[i].value,
+                type: samples[i].type,
+                timestamp: samples[i].timestamp,
+                notes: samples[i].notes,
+                priority: getPriority(samples[i].value, samples[i].type),
+                reviewed: samples[i].reviewed
+            });
+        }
+    }
+
+    function addEntry() {
+        var glucoseVal = parseFloat(document.getElementById("glucoseInput").value);
+        var timeVal    = document.getElementById("timeInput").value;
+        var notesVal   = document.getElementById("notesInput").value.trim();
+        var entryType  = document.getElementById("entryType").value;
+
+        if (isNaN(glucoseVal) || timeVal === "") {
+            showMsg("Please enter both a glucose value and a timestamp.", "error");
+            return;
+        }
+
+        if (glucoseVal < 20 || glucoseVal > 600) {
+            showMsg("Glucose value must be between 20 and 600 mg/dL.", "error");
+            return;
+        }
+
+        // duplicate check — one entry per type per day
+        var newDatePart = getDatePart(new Date(timeVal).toISOString());
+        for (var i = 0; i < entries.length; i++) {
+            if (entries[i].type === entryType && getDatePart(entries[i].timestamp) === newDatePart) {
+                var existingDate = new Date(entries[i].timestamp).toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+                var typeLabel = entryType === "fasting" ? "fasting" : "1-hour post-meal";
+                showMsg("A " + typeLabel + " entry for " + existingDate + " already exists. Edit the existing entry if needed.", "error");
+                return;
+            }
+        }
+
+        var newEntry = {
+            id: Date.now(),
+            value: glucoseVal,
+            type: entryType,
+            timestamp: new Date(timeVal).toISOString(),
+            notes: notesVal,
+            priority: getPriority(glucoseVal, entryType),
+            reviewed: false
+        };
+
+        entries.push(newEntry);
+        showMsg("Entry added successfully!", "success");
+        clearForm();
+        showEntries();
+        updateStats();
+    }
+
+    function deleteEntry(id) {
+        if (!confirm("Are you sure you want to delete this entry?")) return;
+
+        var newList = [];
+        for (var i = 0; i < entries.length; i++) {
+            if (entries[i].id !== id) {
+                newList.push(entries[i]);
+            }
+        }
+        entries = newList;
+        showEntries();
+        updateStats();
+    }
+
+    function startEdit(id) {
+        currentEditId = id;
+        showEntries();
+        var inp = document.getElementById("editVal_" + id);
+        if (inp) inp.focus();
+    }
+
+    function saveEdit(id) {
+        var valInput  = document.getElementById("editVal_" + id);
+        var tsInput   = document.getElementById("editTs_" + id);
+        var newVal    = parseFloat(valInput.value);
+
+        if (isNaN(newVal) || newVal < 20 || newVal > 600) {
+            alert("Please enter a valid glucose value between 20 and 600.");
+            return;
+        }
+
+        // find the entry to get its type for duplicate check
+        var entryType = "";
+        for (var j = 0; j < entries.length; j++) {
+            if (entries[j].id === id) { entryType = entries[j].type; break; }
+        }
+
+        var newDate = getDatePart(new Date(tsInput.value).toISOString());
+        for (var i = 0; i < entries.length; i++) {
+            if (entries[i].id !== id && entries[i].type === entryType && getDatePart(entries[i].timestamp) === newDate) {
+                alert("Another " + entryType + " entry already exists for that date.");
+                return;
+            }
+        }
+
+        for (var k = 0; k < entries.length; k++) {
+            if (entries[k].id === id) {
+                entries[k].value     = newVal;
+                entries[k].timestamp = new Date(tsInput.value).toISOString();
+                entries[k].priority  = getPriority(newVal, entries[k].type);
+                break;
+            }
+        }
+
+        currentEditId = null;
+        showEntries();
+        updateStats();
+    }
+
+    function cancelEdit() {
+        currentEditId = null;
+        showEntries();
+    }
+
+    function showEntries() {
+        var filterType = document.getElementById("filterType").value;
+        var filterPri  = document.getElementById("filterPriority").value;
+        var sortVal    = document.getElementById("sortOrder").value;
+
+        var filtered = [];
+        for (var i = 0; i < entries.length; i++) {
+            var matchType = (filterType === "all" || entries[i].type === filterType);
+            var matchPri  = (filterPri  === "all" || entries[i].priority === filterPri);
+            if (matchType && matchPri) {
+                filtered.push(entries[i]);
+            }
+        }
+
+        filtered.sort(function(a, b) {
+            var diff = new Date(a.timestamp) - new Date(b.timestamp);
+            return sortVal === "desc" ? -diff : diff;
+        });
+
+        var listDiv = document.getElementById("entryList");
+
+        if (filtered.length === 0) {
+            listDiv.innerHTML = '<div class="empty-msg">No entries to show.</div>';
+            return;
+        }
+
+        var html = "";
+
+        for (var k = 0; k < filtered.length; k++) {
+            var e = filtered[k];
+            var isEditing = (e.id === currentEditId);
+            var tsForInput = new Date(e.timestamp).toISOString().substring(0, 16);
+            var reviewText  = e.reviewed ? "&#10004; Reviewed" : "&#9201; Pending provider review";
+            var reviewClass = e.reviewed ? "review-status done" : "review-status";
+            var priorityLabel = e.priority.charAt(0).toUpperCase() + e.priority.slice(1);
+            var typeLabel = e.type === "fasting" ? "Fasting" : "1-Hr Post-Meal";
+            var typeClass = e.type === "fasting" ? "type-tag" : "type-tag postmeal";
+
+            // show the target threshold for context
+            var threshold = e.type === "fasting" ? "Target: &lt;95" : "Target: &lt;140";
+
+            if (isEditing) {
+                html += '<div class="entry-card">';
+                html += '<div class="entry-top">';
+                html += '<div><input class="edit-val-input" id="editVal_' + e.id + '" type="number" value="' + e.value + '" min="20" max="600"> <span style="font-size:12px;color:#888;">mg/dL</span></div>';
+                html += '</div>';
+                html += '<div style="margin-top:6px;"><input class="edit-ts-input" id="editTs_' + e.id + '" type="datetime-local" value="' + tsForInput + '"></div>';
+                html += '<div class="entry-actions">';
+                html += '<button class="saveBtn" onclick="saveEdit(' + e.id + ')">Save</button>';
+                html += '<button class="cancelBtn" onclick="cancelEdit()">Cancel</button>';
+                html += '</div>';
+                html += '</div>';
+            } else {
+                html += '<div class="entry-card">';
+                html += '<div class="entry-top">';
+                html += '<div class="glucose-val">' + e.value + '<span>mg/dL</span></div>';
+                html += '<div class="badges">';
+                html += '<span class="' + typeClass + '">' + typeLabel + '</span>';
+                html += '<span class="priority ' + e.priority + '">' + priorityLabel + '</span>';
+                html += '</div>';
+                html += '</div>';
+                html += '<div class="entry-details">';
+                html += '<span>&#128336; ' + formatDate(e.timestamp) + '</span>';
+                html += '<span style="color:#aaa;font-size:12px;">' + threshold + '</span>';
+                if (e.notes !== "") {
+                    html += '<br><span>&#128221; ' + e.notes + '</span>';
+                }
+                html += '</div>';
+                html += '<div class="' + reviewClass + '">' + reviewText + '</div>';
+                html += '<div class="entry-actions">';
+                html += '<button class="editBtn" onclick="startEdit(' + e.id + ')">Edit</button>';
+                html += '<button class="deleteBtn" onclick="deleteEntry(' + e.id + ')">Delete</button>';
+                html += '</div>';
+                html += '</div>';
+            }
+        }
+
+        listDiv.innerHTML = html;
+    }
+
+    function updateStats() {
+        document.getElementById("statTotal").textContent = entries.length;
+
+        var sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        var recent = [];
+        for (var i = 0; i < entries.length; i++) {
+            if (new Date(entries[i].timestamp) >= sevenDaysAgo) {
+                recent.push(entries[i].value);
+            }
+        }
+
+        if (recent.length > 0) {
+            var sum = 0;
+            for (var j = 0; j < recent.length; j++) sum += recent[j];
+            document.getElementById("statAvg").textContent = (sum / recent.length).toFixed(0);
+        } else {
+            document.getElementById("statAvg").textContent = "—";
+        }
+
+        var pending = 0;
+        for (var k = 0; k < entries.length; k++) {
+            if (!entries[k].reviewed) pending++;
+        }
+        document.getElementById("statPending").textContent = pending;
+    }
+
+    function clearForm() {
+        document.getElementById("glucoseInput").value = "";
+        document.getElementById("notesInput").value = "";
+        var now = new Date();
+        now.setSeconds(0, 0);
+        document.getElementById("timeInput").value = now.toISOString().slice(0, 16);
+        setTimeout(function() {
+            document.getElementById("msg").style.display = "none";
+        }, 3000);
+    }
+
+    function showMsg(text, type) {
+        var msgBox = document.getElementById("msg");
+        msgBox.textContent = text;
+        msgBox.className = type;
+    }
+
+    document.getElementById("glucoseInput").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") addEntry();
+    });
+
+    var now = new Date();
+    now.setSeconds(0, 0);
+    document.getElementById("timeInput").value = now.toISOString().slice(0, 16);
+
+    loadSampleData();
+    showEntries();
+    updateStats();
+</script>
+
+</body>
+</html>
